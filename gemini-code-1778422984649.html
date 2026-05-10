@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>UC-009 Wireframe Storyboard – Retail360</title>
+<style>
+/* ── RESET ─────────────────────────── */
+*{margin:0;padding:0;box-sizing:border-box;}
+body{
+  font-family:Arial,Helvetica,sans-serif;
+  background:#e8edf5;
+  padding:32px 28px 60px;
+}
+
+/* ── PAGE HEADER (handwritten-ish) ── */
+.pg-title{
+  font-family:Georgia,serif;
+  font-size:24px; font-weight:700;
+  color:#1a2040;
+  text-decoration:underline;
+  text-decoration-color:#3060cc;
+  text-underline-offset:5px;
+  margin-bottom:3px;
+}
+.pg-sub{font-size:12px;color:#556;margin-bottom:22px;}
+
+/* ── CANVAS (graph paper) ─────────── */
+.canvas{
+  background-color:#f0f4fc;
+  background-image:
+    linear-gradient(rgba(80,110,200,.13) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(80,110,200,.13) 1px, transparent 1px),
+    linear-gradient(rgba(80,110,200,.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(80,110,200,.06) 1px, transparent 1px);
+  background-size:28px 28px,28px 28px,7px 7px,7px 7px;
+  border:2px solid #b0bcda;
+  border-radius:14px;
+  padding:30px 36px 38px;
+  box-shadow:0 6px 28px rgba(0,0,0,.12);
+  position:relative;
+  min-width:1050px;
+}
+
+/* ── CANVAS TITLE ─────────────────── */
+.c-logo{text-align:center;font-size:26px;font-weight:900;letter-spacing:3px;color:#1a2040;line-height:1;}
+.c-sys {text-align:center;font-size:12px;color:#556;margin-top:3px;}
+.c-uc  {text-align:center;font-size:10.5px;color:#3060cc;font-style:italic;margin-top:2px;margin-bottom:26px;}
+
+/* ── STORYBOARD ROW ───────────────── */
+.sb-row{
+  display:flex;
+  align-items:center;
+  gap:0;
+  margin-bottom:0;
+}
+
+/* ── PANEL ────────────────────────── */
+.panel{
+  flex:0 0 288px;
+  background:#ffffff;
+  border:1.8px solid #8896b8;
+  border-radius:9px;
+  overflow:visible;
+  position:relative;
+  box-shadow:3px 4px 12px rgba(0,0,0,.13);
+}
+.p-head{
+  background:#c6d0e8;
+  border-bottom:1.5px solid #8896b8;
+  padding:5px 10px 4px;
+  display:flex;align-items:center;gap:6px;
+  border-radius:7px 7px 0 0;
+}
+.p-dots{display:flex;gap:4px;}
+.p-dot{width:9px;height:9px;border-radius:50%;}
+.p-title{flex:1;text-align:center;font-size:10.5px;font-weight:700;color:#1a2040;}
+.p-body{padding:9px 10px 10px;position:relative;}
+
+/* ── STEP LABEL ───────────────────── */
+.step-lbl{
+  text-align:center;
+  margin-top:7px;
+  font-size:10px;font-weight:700;
+  color:#1a2040;
+  background:#d8e0f5;
+  border:1px solid #8896b8;
+  border-radius:5px;
+  padding:3px 0 2px;
+  width:288px;
+}
+
+/* ── BETWEEN-PANEL ARROW ──────────── */
+.arrow-col{
+  flex:0 0 42px;
+  display:flex;flex-direction:column;
+  align-items:center;
+  gap:3px;
+  padding:0 2px;
+  align-self:center;
+  margin-top:-20px; /* align to middle of panel body */
+}
+.arrow-svg{display:block;}
+.arr-lbl{
+  font-size:10px;color:#cc1100;
+  font-style:italic;
+  text-align:center;
+  white-space:nowrap;
+}
+
+/* ── ROW-TO-ROW CONNECTOR ─────────── */
+.row-connector{
+  display:flex;
+  justify-content:flex-end;
+  padding-right:144px; /* align to right-panel right edge */
+  margin:6px 0 6px;
+  position:relative;
+}
+.conn-line{
+  display:flex;flex-direction:column;align-items:center;gap:2px;
+}
+.conn-lbl{font-size:8.5px;color:#cc1100;font-style:italic;text-align:center;}
+
+/* ── UI ELEMENTS inside panels ──────── */
+.inp{
+  border:1px solid #999;border-radius:3px;
+  background:#f9f9f9;padding:3px 6px;
+  font-size:9px;color:#666;width:100%;margin-bottom:5px;
+}
+.btn{
+  display:block;background:#2a4bbf;color:#fff;
+  border:none;border-radius:5px;
+  padding:5px 10px;font-size:9.5px;font-weight:700;
+  text-align:center;width:100%;margin:4px 0;cursor:default;
+}
+.btn-sm{
+  display:block;background:#2a4bbf;color:#fff;
+  border:none;border-radius:4px;
+  padding:3px 8px;font-size:8.5px;font-weight:700;
+  text-align:center;cursor:default;
+}
+.btn-out{
+  display:block;background:#fff;color:#2a4bbf;
+  border:1.5px solid #2a4bbf;border-radius:4px;
+  padding:3px 8px;font-size:8.5px;font-weight:700;
+  text-align:center;cursor:default;margin:3px 0;
+}
+.lbl{font-size:9px;color:#333;margin-bottom:2px;font-weight:700;}
+.logo-big{text-align:center;font-size:20px;font-weight:900;letter-spacing:2px;color:#1a2040;margin-bottom:1px;}
+.sub-sm{text-align:center;font-size:8.5px;color:#556;margin-bottom:6px;}
+
+/* tabs */
+.tabs{display:flex;border-bottom:1.5px solid #ccc;margin-bottom:7px;}
+.tab{flex:1;text-align:center;font-size:8.5px;padding:3px 0;color:#777;}
+.tab.on{font-weight:700;color:#2a4bbf;border-bottom:2.5px solid #2a4bbf;}
+
+/* parking summary */
+.sum-row{display:flex;gap:4px;margin-bottom:7px;}
+.sum-box{flex:1;border:1px solid #ccc;border-radius:4px;text-align:center;padding:4px 2px;background:#f7f9ff;}
+.sum-v{font-size:13px;font-weight:700;}
+.sum-l{font-size:7.5px;color:#666;}
+
+/* level row */
+.lv{background:#f4f6fc;border:1px solid #d0d6ea;border-radius:5px;padding:4px 6px;margin-bottom:4px;}
+.lv-top{display:flex;justify-content:space-between;font-size:8.5px;margin-bottom:3px;}
+.bar{height:7px;background:#e0e4ee;border-radius:3px;overflow:hidden;margin-bottom:2px;}
+.bf{height:100%;border-radius:3px;}
+.lv-bot{display:flex;justify-content:space-between;font-size:7.5px;}
+.badge{font-size:7px;font-weight:700;border-radius:8px;padding:1px 5px;}
+
+/* mini map grid */
+.map-grid{display:grid;grid-template-columns:repeat(10,1fr);gap:2px;margin-bottom:6px;}
+.sp{height:12px;border-radius:2px;border:0.5px solid rgba(0,0,0,.15);}
+
+/* session card */
+.sess{background:linear-gradient(135deg,#12275a,#2a4bbf);border-radius:7px;padding:8px;color:#fff;text-align:center;margin-bottom:6px;}
+.plate-txt{font-family:monospace;font-size:13px;font-weight:700;letter-spacing:2px;
+            background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);
+            border-radius:4px;padding:2px 10px;display:inline-block;margin:4px 0;}
+.timer-txt{font-family:monospace;font-size:22px;font-weight:700;letter-spacing:1px;}
+.det{background:rgba(255,255,255,.12);border-radius:3px;padding:2px 6px;
+      display:flex;justify-content:space-between;font-size:8px;margin-top:3px;}
+
+/* quick-action grid */
+.qa{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-bottom:5px;}
+.qi{background:#f4f6fc;border:1px solid #c8d0e4;border-radius:5px;
+    padding:6px 3px 4px;text-align:center;font-size:8px;color:#445;}
+.qi.hi{background:#dde8ff;border:1.5px solid #2a4bbf;color:#2a4bbf;font-weight:700;}
+.qi-icon{font-size:16px;display:block;margin-bottom:2px;}
+
+/* loyalty card */
+.lc{background:linear-gradient(135deg,#12275a,#2a4bbf);border-radius:6px;padding:7px 9px;color:#fff;margin-bottom:7px;}
+
+/* ── RED CIRCLE overlay ───────────── */
+.r-circle{
+  position:absolute;
+  border:2.5px solid #cc1100;
+  border-radius:50%;
+  pointer-events:none;
+  z-index:10;
+}
+
+/* ── ANNOTATION TEXT ──────────────── */
+.ann-r{color:#cc1100;font-size:10px;font-style:italic;white-space:normal;line-height:1.5;}
+.ann-b{color:#1a4fcc;font-size:10px;font-style:italic;}
+
+/* ── STICKY NOTE ──────────────────── */
+.sticky{
+  background:#fffde7;border:1px solid #d4b800;border-radius:5px;
+  padding:6px 8px;font-size:9.5px;color:#444;line-height:1.55;
+  box-shadow:2px 3px 8px rgba(0,0,0,.12);
+  position:absolute;
+  z-index:20;
+  min-width:130px;
+}
+.sticky b{color:#1a4fcc;}
+
+/* ── BOTTOM NOTES SECTION ─────────── */
+.bnotes{
+  display:grid;grid-template-columns:1fr 1fr 1fr;
+  gap:0;margin-top:28px;
+  padding-top:14px;border-top:1.5px solid #b0bcda;
+}
+.bn-col{padding:0 18px;}
+.bn-col+.bn-col{border-left:1px solid #c0c8e0;}
+.bn-head{font-size:11px;font-weight:700;font-style:italic;margin-bottom:5px;}
+.bn-li{font-size:10.5px;line-height:1.9;font-style:italic;}
+</style>
+</head>
+<body>
+
+<div class="pg-title">Prototype / Wireframe</div>
+<div class="pg-sub">UC-009: Monitor Real-Time Parking Status &nbsp;·&nbsp; Retail360 Arcade Suite &nbsp;·&nbsp; ISOM3210 Spring 2026</div>
+
+<div class="canvas">
+
+  <div class="c-logo">Retail360</div>
+  <div class="c-sys">Arcade Suite — Mobile Wireframe Prototype</div>
+  <div class="c-uc">UC-009 Monitor Real-Time Parking Status &nbsp;|&nbsp; Steps 1–11 (Main Flow) &nbsp;|&nbsp; Actors: Member [P], In-house Parking System [S]</div>
+
+  <div class="sb-row">
+
+    <div>
+      <div class="panel" style="width:288px;">
+        <div class="p-head">
+          <div class="p-dots">
+            <div class="p-dot" style="background:#ff5f57;"></div>
+            <div class="p-dot" style="background:#febc2e;"></div>
+            <div class="p-dot" style="background:#28c840;"></div>
+          </div>
+          <div class="p-title">Welcome to Retail360</div>
+        </div>
+        <div class="p-body" style="padding-bottom:12px;">
+          <div class="logo-big">Retail360</div>
+          <div class="sub-sm">Arcade Suite</div>
+
+          <div class="lbl">Username / Mobile No.</div>
+          <div class="inp">username</div>
+          <div class="lbl">PW</div>
+          <div class="inp">••••••</div>
+
+          <div style="position:relative;margin-top:6px;">
+            <div class="btn">LOGIN</div>
+            <div class="r-circle" style="top:-4px;left:-4px;right:-4px;bottom:-4px;border-radius:7px;"></div>
+          </div>
+
+          <div style="margin-top:8px;">
+            <div class="ann-r">① Login() → MEMBER [Step 1]</div>
+          </div>
+          <div class="ann-b" style="margin-top:4px;">IUC-001</div>
+        </div>
+      </div>
+      <div class="step-lbl">Step 1 — Login</div>
+    </div>
+
+    <div class="arrow-col">
+      <svg class="arrow-svg" width="42" height="22" viewBox="0 0 42 22">
+        <line x1="2" y1="11" x2="36" y2="11" stroke="#222" stroke-width="1.8"/>
+        <polygon points="36,6 42,11 36,16" fill="#222"/>
+      </svg>
+      <div class="arr-lbl" style="color:#888;font-style:italic;">→ Member Home</div>
+    </div>
+
+    <div>
+      <div class="panel" style="width:288px;">
+        <div class="p-head">
+          <div class="p-dots">
+            <div class="p-dot" style="background:#ff5f57;"></div>
+            <div class="p-dot" style="background:#febc2e;"></div>
+            <div class="p-dot" style="background:#28c840;"></div>
+          </div>
+          <div class="p-title">Member Home</div>
+        </div>
+        <div class="p-body">
+          <div class="lc">
+            <div style="font-size:8.5px;opacity:.8;">Hello, Alex 👋 · Gold Member ⭐</div>
+            <div style="font-size:18px;font-weight:700;letter-spacing:-0.5px;margin-top:2px;">
+              2,450 <span style="font-size:9px;font-weight:400;opacity:.7;">pts</span>
+            </div>
+          </div>
+          <div style="font-size:7.5px;font-weight:700;color:#778;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">Quick Actions</div>
+          <div class="qa">
+            <div class="qi"><span class="qi-icon">📸</span>Earn Pts</div>
+            <div class="qi"><span class="qi-icon">🎁</span>Redeem</div>
+            <div class="qi"><span class="qi-icon">🏷</span>Offers</div>
+            <div class="qi hi" style="position:relative;">
+              <span class="qi-icon">🚗</span>Parking
+              <div class="r-circle" style="top:-4px;left:-4px;right:-4px;bottom:-4px;border-radius:8px;"></div>
+            </div>
+            <div class="qi"><span class="qi-icon">👤</span>Profile</div>
+            <div class="qi"><span class="qi-icon">📊</span>History</div>
+          </div>
+          <div class="ann-r" style="margin-top:3px;">① tap "🚗 Parking" tile [Step 2]</div>
+        </div>
+      </div>
+      <div class="step-lbl">Step 2 — Select "Parking"</div>
+    </div>
+
+    <div class="arrow-col">
+      <svg class="arrow-svg" width="42" height="22" viewBox="0 0 42 22">
+        <line x1="2" y1="11" x2="36" y2="11" stroke="#222" stroke-width="1.8"/>
+        <polygon points="36,6 42,11 36,16" fill="#222"/>
+      </svg>
+      <div class="arr-lbl" style="color:#888;font-style:italic;">→ Parking</div>
+    </div>
+
+    <div style="position:relative;">
+      <div class="panel" style="width:288px;">
+        <div class="p-head">
+          <div class="p-dots">
+            <div class="p-dot" style="background:#ff5f57;"></div>
+            <div class="p-dot" style="background:#febc2e;"></div>
+            <div class="p-dot" style="background:#28c840;"></div>
+          </div>
+          <div class="p-title">Parking — Availability</div>
+        </div>
+        <div class="p-body">
+          <div class="tabs" style="position:relative;">
+            <div class="tab on">Availability</div>
+            <div class="tab" style="position:relative;">
+              My Session
+              <div class="r-circle" style="top:-2px;left:-4px;right:-4px;bottom:-2px;border-radius:4px;"></div>
+            </div>
+          </div>
+
+          <div style="display:flex;align-items:center;gap:5px;margin-bottom:6px;">
+            <div style="width:7px;height:7px;border-radius:50%;background:#28c840;"></div>
+            <span style="font-size:8px;font-weight:700;color:#28c840;">LIVE</span>
+            <span style="font-size:8px;color:#666;">· Updated just now</span>
+          </div>
+
+          <div class="sum-row">
+            <div class="sum-box"><div class="sum-v" style="color:#28c840;">110</div><div class="sum-l">Available</div></div>
+            <div class="sum-box"><div class="sum-v" style="color:#e07000;">270</div><div class="sum-l">Occupied</div></div>
+            <div class="sum-box"><div class="sum-v" style="color:#333;">380</div><div class="sum-l">Total</div></div>
+          </div>
+
+          <div class="lv">
+            <div class="lv-top"><span style="font-weight:600;">Level 1</span><span class="badge" style="background:#d4f5dc;color:#187a30;">Available</span></div>
+            <div class="bar"><div class="bf" style="width:63%;background:#28c840;"></div></div>
+            <div class="lv-bot"><span style="color:#28c840;">45 free</span><span style="color:#888;">75/120</span></div>
+          </div>
+          <div class="lv">
+            <div class="lv-top"><span style="font-weight:600;">Level 2</span><span class="badge" style="background:#fff0d0;color:#8a5500;">Limited</span></div>
+            <div class="bar"><div class="bf" style="width:81%;background:#e07000;"></div></div>
+            <div class="lv-bot"><span style="color:#e07000;">23 free</span><span style="color:#888;">97/120</span></div>
+          </div>
+          <div class="lv">
+            <div class="lv-top"><span style="font-weight:600;">Level B1</span><span class="badge" style="background:#d4f5dc;color:#187a30;">Available</span></div>
+            <div class="bar"><div class="bf" style="width:50%;background:#28c840;"></div></div>
+            <div class="lv-bot"><span style="color:#28c840;">30 free</span><span style="color:#888;">30/60</span></div>
+          </div>
+
+          <div style="margin-top:5px;">
+            <div style="border:1.5px dashed #9b1111;border-radius:4px;padding:3px 6px;background:rgba(255,232,232,.45);">
+              <div style="font-size:8.5px;font-weight:700;color:#9b1111;margin-bottom:2px;">&#9676; PARKING_RECORD (External [S])</div>
+              <div class="ann-r">① Retrieve_Occupancy() → PARKING_RECORD [S] [Step 3]</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="step-lbl">Step 3 — View Availability</div>
+
+      <div class="sticky" style="right:-148px;top:34px;">
+        <b>System action (Step 3):</b><br>
+        Calls In-house Parking<br>
+        System <b>[S]</b> for real-time<br>
+        occupancy data
+      </div>
+    </div>
+
+  </div><div style="position:relative;height:38px;margin:2px 0 0;">
+    <svg width="100%" height="38" style="position:absolute;top:0;left:0;overflow:visible;">
+      <line x1="24" y1="2" x2="24" y2="36" stroke="#222" stroke-width="1.8" stroke-dasharray="4,2"/>
+      <polygon points="18,30 24,38 30,30" fill="#222"/>
+    </svg>
+    <div style="position:absolute;left:32px;top:14px;" class="arr-lbl">cont. →</div>
+  </div>
+
+  <div class="sb-row" style="margin-top:2px;">
+
+    <div>
+      <div class="panel" style="width:288px;">
+        <div class="p-head">
+          <div class="p-dots">
+            <div class="p-dot" style="background:#ff5f57;"></div>
+            <div class="p-dot" style="background:#febc2e;"></div>
+            <div class="p-dot" style="background:#28c840;"></div>
+          </div>
+          <div class="p-title">Parking Map — Level 2</div>
+        </div>
+        <div class="p-body">
+          <div style="font-size:8.5px;font-weight:700;color:#1a2040;margin-bottom:4px;">Spot Overview — Level 2</div>
+
+          <div style="background:#f4f6fc;border:1px solid #ccd;border-radius:5px;padding:6px;margin-bottom:6px;">
+            <div style="text-align:center;font-size:7px;color:#999;margin-bottom:3px;">← Drive Lane →</div>
+            <div class="map-grid" style="margin-bottom:4px;">
+              <div class="sp" style="background:#28c840;"></div>
+              <div class="sp" style="background:#e05000;"></div>
+              <div class="sp" style="background:#e05000;"></div>
+              <div class="sp" style="background:#28c840;"></div>
+              <div class="sp" style="background:#e05000;"></div>
+              <div class="sp" style="background:#e05000;"></div>
+              <div class="sp" style="background:#e05000;"></div>
+              <div class="sp" style="background:#28c840;"></div>
+              <div class="sp" style="background:#e05000;"></div>
+              <div class="sp" style="background:#e05000;"></div>
+            </div>
+            <div class="map-grid">
+              <div class="sp" style="background:#e05000;"></div>
+              <div class="sp" style="background:#e05000;"></div>
+              <div class="sp" style="background:#f5c400;border:1.5px solid #b89000;"></div>
+              <div class="sp" style="background:#e05000;"></div>
+              <div class="sp" style="background:#e05000;"></div>
+              <div class="sp" style="background:#28c840;"></div>
+              <div class="sp" style="background:#e05000;"></div>
+              <div class="sp" style="background:#28c840;"></div>
+              <div class="sp" style="background:#28c840;"></div>
+              <div class="sp" style="background:#e05000;"></div>
+            </div>
+            <div style="display:flex;gap:8px;margin-top:5px;justify-content:center;">
+              <div style="display:flex;align-items:center;gap:3px;font-size:7.5px;"><div style="width:9px;height:9px;background:#28c840;border-radius:1px;"></div>Free</div>
+              <div style="display:flex;align-items:center;gap:3px;font-size:7.5px;"><div style="width:9px;height:9px;background:#e05000;border-radius:1px;"></div>Occupied</div>
+              <div style="display:flex;align-items:center;gap:3px;font-size:7.5px;"><div style="width:9px;height:9px;background:#f5c400;border:1px solid #b89000;border-radius:1px;"></div>You</div>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:4px;margin-bottom:6px;">
+            <div style="flex:1;border:1px solid #ccc;border-radius:4px;text-align:center;font-size:8.5px;padding:3px;background:#f4f6fc;">L1</div>
+            <div style="flex:1;border:1.5px solid #2a4bbf;border-radius:4px;text-align:center;font-size:8.5px;padding:3px;background:#dde8ff;font-weight:700;color:#2a4bbf;">L2</div>
+            <div style="flex:1;border:1px solid #ccc;border-radius:4px;text-align:center;font-size:8.5px;padding:3px;background:#f4f6fc;">L3</div>
+            <div style="flex:1;border:1px solid #ccc;border-radius:4px;text-align:center;font-size:8.5px;padding:3px;background:#f4f6fc;">B1</div>
+          </div>
+
+          <div style="position:relative;">
+            <div class="btn-sm" style="text-align:center;padding:5px;font-size:9px;display:block;">My Current Session →</div>
+            <div class="r-circle" style="top:-3px;left:-3px;right:-3px;bottom:-3px;border-radius:7px;"></div>
+          </div>
+          <div style="margin-top:6px;">
+            <div class="ann-r">① tap "My Current Session →" [Step 5]</div>
+          </div>
+        </div>
+      </div>
+      <div class="step-lbl">Step 4 — Level Map View</div>
+    </div>
+
+    <div class="arrow-col">
+      <svg class="arrow-svg" width="42" height="22" viewBox="0 0 42 22">
+        <line x1="2" y1="11" x2="36" y2="11" stroke="#222" stroke-width="1.8"/>
+        <polygon points="36,6 42,11 36,16" fill="#222"/>
+      </svg>
+      <div class="arr-lbl">Retrieve_LicensePlateNo()</div>
+    </div>
+
+    <div style="position:relative;">
+      <div class="panel" style="width:288px;">
+        <div class="p-head">
+          <div class="p-dots">
+            <div class="p-dot" style="background:#ff5f57;"></div>
+            <div class="p-dot" style="background:#febc2e;"></div>
+            <div class="p-dot" style="background:#28c840;"></div>
+          </div>
+          <div class="p-title">Parking — My Session</div>
+        </div>
+        <div class="p-body">
+          <div class="tabs">
+            <div class="tab">Availability</div>
+            <div class="tab on">My Session</div>
+          </div>
+
+          <div class="sess">
+            <svg width="80" height="42" viewBox="0 0 80 42" style="display:block;margin:0 auto 4px;">
+              <rect x="6" y="20" width="68" height="16" fill="#3b82f6" rx="3"/>
+              <path d="M14 20 Q16 10 26 8 L54 8 Q64 10 66 20Z" fill="#60a5fa"/>
+              <circle cx="20" cy="36" r="6" fill="#1e293b"/>
+              <circle cx="20" cy="36" r="2.5" fill="#64748b"/>
+              <circle cx="60" cy="36" r="6" fill="#1e293b"/>
+              <circle cx="60" cy="36" r="2.5" fill="#64748b"/>
+              <rect x="17" y="10" width="16" height="9" fill="#93c5fd" rx="2" opacity=".85"/>
+              <rect x="47" y="10" width="16" height="9" fill="#93c5fd" rx="2" opacity=".85"/>
+            </svg>
+            <div class="plate-txt">ABC · 1234</div>
+            <div style="font-size:8px;opacity:.75;margin-top:3px;">Current Duration</div>
+            <div class="timer-txt">01 : 23 : 47</div>
+          </div>
+
+          <div style="background:#f4f6fc;border:1px solid #ccd;border-radius:5px;overflow:hidden;margin-bottom:6px;">
+            <div style="display:flex;justify-content:space-between;padding:4px 8px;font-size:8.5px;border-bottom:1px solid #dde;">
+              <span style="color:#666;">🕒 Entry Time</span><span style="font-weight:700;">2:30 PM</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:4px 8px;font-size:8.5px;border-bottom:1px solid #dde;">
+              <span style="color:#666;">🅿️ Level</span><span style="font-weight:700;">Level 2</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:4px 8px;font-size:8.5px;">
+              <span style="color:#666;">💰 Est. Fee</span><span style="font-weight:700;">~ HK$25</span>
+            </div>
+          </div>
+
+          <div class="ann-r">① Retrieve_LicensePlateNo() → MEMBER [Step 6]</div>
+          <div class="ann-r" style="margin-top:3px;">② Send_to_ParkingSystem() → In-house Parking [S] [Step 8 trigger]</div>
+          
+          <div style="border:1.5px dashed #9b1111;border-radius:4px;padding:3px 6px;margin-top:3px;background:rgba(255,232,232,.45);">
+            <div style="font-size:8.5px;font-weight:700;color:#9b1111;margin-bottom:2px; position:relative;">
+              <span style="display:inline-block; margin-right:5px;">&#9676; External [S]</span>
+              
+              <div style="position:absolute; left:66px; top:-4px; display:flex; align-items:center; z-index:25;">
+                <svg width="22" height="10" viewBox="0 0 22 10">
+                  <line x1="0" y1="5" x2="16" y2="5" stroke="#800080" stroke-width="1.5"/>
+                  <polygon points="16,2 21,5 16,8" fill="#800080"/>
+                </svg>
+                <div style="background:#fdf4ff; border:1px solid #800080; border-radius:4px; padding:3px 5px; font-size:7.5px; color:#4b0082; white-space:nowrap; margin-left:2px; box-shadow: 2px 2px 6px rgba(0,0,0,0.15);">
+                  Datastore of in-house parking system
+                </div>
+              </div>
+            </div>
+            <div class="ann-r">③ Retrieve_ParkingDuration() → PARKING_RECORD [S] [Steps 8 &amp; 10]</div>
+          </div>
+
+          <div style="position:relative;margin-top:7px;">
+            <div class="btn" style="background:#c0392b;">Close</div>
+            <div class="r-circle" style="top:-4px;left:-4px;right:-4px;bottom:-4px;border-radius:7px;"></div>
+          </div>
+          <div class="ann-r" style="margin-top:3px;">③ Member closes module [Step 11]</div>
+        </div>
+      </div>
+      <div class="step-lbl">Steps 5–11 / Close</div>
+
+      <div class="sticky" style="right:-236px;top:36px;min-width:250px;">
+        <b>Steps 6 &amp; 8:</b><br>
+        Retrieve_LicensePlateNo() ← <b>MEMBER</b><br>
+        <span style="color:#1a4fcc;">Send_to_ParkingSystem() ← <b>MEMBER</b></span><br>
+        <span style="color:#cc1100;">Retrieve_ParkingDuration() ← <b>PARKING_RECORD [S]</b></span><br>
+        <b>Steps 10–11:</b><br>
+        System displays duration;<br>
+        Member closes → Menu
+      </div>
+    </div>
+
+  </div><div class="bnotes" style="margin-top:56px;">
+
+    <div class="bn-col">
+      <div class="bn-head" style="color:#1a4fcc;">↑ UI Interaction note:</div>
+      <div class="bn-li" style="color:#1a4fcc;">
+        Parking duration is retrieved<br>
+        from PARKING_RECORD [S]<br>
+        at runtime — not stored<br>
+        in the Retail360 datastore
+      </div>
+    </div>
+
+    <div class="bn-col">
+      <div class="bn-head" style="color:#1a4fcc;">↑ Class diagram method calls:</div>
+      <div class="bn-li" style="color:#1a4fcc;">
+        1. Login() → MEMBER &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Step 1]<br>
+        2. Retrieve_Occupancy() → PARKING_RECORD [S] &nbsp;&nbsp;&nbsp;[Step 3]<br>
+        3. Retrieve_LicensePlateNo() → MEMBER &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Step 6]<br>
+        4. Send_to_ParkingSystem() → In-house Parking [S] &nbsp;[Step 8 trigger]<br>
+        5. Retrieve_ParkingDuration() → PARKING_RECORD [S] [Steps 8 &amp; 10]
+      </div>
+    </div>
+
+    <div class="bn-col">
+      <div class="bn-head" style="color:#cc1100;">① Annotated method calls (red):</div>
+      <div class="bn-li" style="color:#cc1100;">
+        ① Login() [MEMBER] — Step 1<br>
+        ② Retrieve_Occupancy() [PARKING_RECORD] — Step 3<br>
+        ③ Retrieve_LicensePlateNo() [MEMBER] — Step 6<br>
+        ④ Retrieve_ParkingDuration() [PARKING_RECORD] — Steps 8 &amp; 10<br>
+        ⑤ Send_to_ParkingSystem() [MEMBER] — Step 8 trigger<br>
+        ⑥ Close button — Step 11
+      </div>
+    </div>
+
+  </div>
+
+</div></body>
+</html>
