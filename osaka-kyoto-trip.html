@@ -122,7 +122,7 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--ink);outline-off
   <header>
     <div style="display:flex;justify-content:space-between;align-items:flex-start">
       <div><div class="eyebrow">KIX ・ OSAKA → KYOTO</div><h1>大阪・京都 家族旅行</h1></div>
-      <div class="hright"><div>2026</div><div>7/14–7/19</div></div>
+      <div class="hright"><div>2026</div><div>7/14–7/19</div><button id="langBtn" onclick="toggleLang()" style="margin-top:6px;cursor:pointer;background:rgba(255,255,255,.15);color:#C9D8E6;border:1px solid rgba(255,255,255,.25);border-radius:6px;padding:3px 8px;font-size:11px;font-family:var(--mono);font-weight:700">繁→簡</button></div>
     </div>
     <div class="hmeta"><span>👨‍👩‍👧‍👦 5 人</span><span>🧳 托運 20kg</span><span>✈️ 18:00 抵 KIX</span></div>
   </header>
@@ -147,9 +147,26 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--ink);outline-off
       <div style="font-weight:700;font-size:13.5px;margin-bottom:8px;color:var(--ink2)" id="mCount">明細</div><div id="mList"></div>
     </section>
     <section id="fx">
-      <div class="hero"><div class="lbl">目前匯率</div><div class="big" id="fxRate">1 HKD = 20.6 JPY</div><div class="row" style="margin-top:12px"><input id="fxRateIn" inputmode="decimal" style="flex:1;background:#1F3B56;color:#fff;border:none;font-family:var(--mono);font-size:15px"><button class="addbtn" id="fxUpdate" style="background:var(--gold)">更新</button></div><div style="font-size:11px;color:#8FA6BC;margin-top:8px">落地換完錢後，把實際匯率填進去更準 👆</div></div>
-      <div class="panel"><div class="field"><div class="fl">港幣 HKD</div><div class="fi"><span class="fsym" style="color:var(--gold)">HK$</span><input id="fxHkd" inputmode="decimal" placeholder="0" value="100"></div></div><div style="text-align:center;margin:6px 0;font-size:18px;color:#9AA6AF">⇅</div><div class="field"><div class="fl">日圓 JPY</div><div class="fi"><span class="fsym" style="color:var(--red)">¥</span><input id="fxJpy" inputmode="decimal" placeholder="0"></div></div></div>
-      <div style="font-weight:700;font-size:13.5px;margin-bottom:8px;color:var(--ink2)">快速對照（日圓 → 港幣）</div><div class="qgrid" id="fxQuick"></div>
+      <div class="hero">
+        <div class="lbl" data-t>輸入日圓金額</div>
+        <div style="position:relative;margin-top:8px"><span style="position:absolute;left:14px;top:14px;font-family:var(--mono);font-size:22px;font-weight:800;color:rgba(255,255,255,.5)">¥</span><input id="fxIn" inputmode="decimal" placeholder="0" style="width:100%;padding:12px 14px 12px 40px;font-family:var(--mono);font-size:28px;font-weight:800;background:rgba(255,255,255,.12);color:#fff;border:1.5px solid rgba(255,255,255,.2);border-radius:12px"></div>
+        <div style="text-align:center;margin:10px 0 2px;font-size:20px;color:#9BB4CC">＝</div>
+        <div style="text-align:center"><span id="fxOut" style="font-family:var(--mono);font-size:36px;font-weight:800;color:var(--gold)">HK$0</span></div>
+        <div style="text-align:center;font-family:var(--mono);font-size:12px;color:#8FA6BC;margin-top:4px" data-t>匯率 1 HKD = <span id="fxRateLabel">20.6</span> JPY</div>
+      </div>
+      <div style="font-weight:700;font-size:13.5px;margin-bottom:8px;color:var(--ink2)" data-t>快速對照</div>
+      <div class="qgrid" id="fxQuick"></div>
+      <details style="margin-top:16px">
+        <summary style="cursor:pointer;font-size:13px;color:var(--ink2);font-weight:600;padding:8px 0" data-t>⚙️ 匯率設定 / 雙向換算</summary>
+        <div class="panel" style="margin-top:8px">
+          <div class="field"><div class="fl" data-t>修改匯率（1 HKD = ? JPY）</div><div class="row"><input id="fxRateIn" inputmode="decimal" style="flex:1;font-family:var(--mono);font-size:15px"><button class="addbtn" id="fxUpdate" style="background:var(--gold)" data-t>更新</button></div><div style="font-size:11px;color:#9AA6AF;margin-top:6px" data-t>落地換完錢後，把實際匯率填進去更準</div></div>
+          <div style="margin-top:14px">
+            <div class="field"><div class="fl" data-t>港幣 HKD → 日圓</div><div class="fi"><span class="fsym" style="color:var(--gold)">HK$</span><input id="fxHkd" inputmode="decimal" placeholder="0" value="100"></div></div>
+            <div style="text-align:center;margin:6px 0;font-size:18px;color:#9AA6AF">⇅</div>
+            <div class="field"><div class="fl" data-t>日圓 JPY → 港幣</div><div class="fi"><span class="fsym" style="color:var(--red)">¥</span><input id="fxJpy" inputmode="decimal" placeholder="0"></div></div>
+          </div>
+        </div>
+      </details>
     </section>
     <section id="save">
       <div class="panel"><h3>➕ 新增收藏</h3><input id="bkName" placeholder="名稱（例：一蘭拉麵 難波店）" style="width:100%;font-size:14px;margin-bottom:8px"><input id="bkUrl" placeholder="Google Maps 連結（貼上網址）" style="width:100%;font-size:13px;margin-bottom:8px"><div class="row"><select id="bkCat" style="flex:1"></select><button class="addbtn" id="bkAdd">收藏</button></div><div id="bkMsg" style="font-size:12px;color:var(--red);margin-top:8px"></div></div>
@@ -322,7 +339,63 @@ const TODO_SEED=[
 const SEC_ORDER=['出發前','7/14','7/15','7/16','7/17','7/18','7/19','每日提醒'];
 const CATS=[['food','餐飲','#C98A28'],['transit','交通','#3D5A75'],['shop','購物','#B0568C'],['ticket','門票景點','#E24A34'],['stay','住宿','#16324F'],['other','其他','#6E8B57']];
 const INFO_FIELDS=[['flight','✈️ 航班號 / 時間'],['car','🚗 專車接送（司機/聯絡）'],['usj','🎟️ USJ 門票號 / 快速通關'],['kimono','👘 和服 一番星（預約時間/編號）'],['plum','🏨 Plum Hotel 確認碼'],['minn','🏯 Minn 清水五條 確認碼'],['haruka','🚄 Haruka 特急券'],['insurance','🛡️ 旅平險（保單/緊急電話）']];
-const PHRASES=[['這個多少錢？','これはいくらですか？'],['我要結帳','お会計お願いします'],['可以刷卡嗎？','カードは使えますか？'],['我要退稅','免税でお願いします'],['廁所在哪裡？','トイレはどこですか？'],['請給我這個','これをください'],['不要山葵','わさび抜きで'],['5 位','5人です'],['很好吃','おいしいです'],['謝謝','ありがとうございます']];
+const PHRASES=[
+ ['🍽️ 餐廳',[
+  ['我要結帳','お会計お願いします','Okaikei onegai shimasu'],
+  ['5 位','5人です','Go-nin desu'],
+  ['有預約，姓__','予約した__です','Yoyaku shita __ desu'],
+  ['可以刷卡嗎？','カードは使えますか？','Kādo wa tsukae masu ka'],
+  ['請給我這個','これをください','Kore wo kudasai'],
+  ['請給我菜單','メニューをください','Menyū wo kudasai'],
+  ['有中文菜單嗎？','中国語のメニューはありますか？','Chūgokugo no menyū wa arimasu ka'],
+  ['不要山葵','わさび抜きで','Wasabi nuki de'],
+  ['不辣','辛くしないで','Karaku shinai de'],
+  ['很好吃','おいしいです','Oishii desu'],
+  ['我對__過敏','__アレルギーです','__ arerugī desu'],
+  ['可以拍照嗎？','写真を撮ってもいいですか？','Shashin wo totte mo ii desu ka'],
+  ['推薦什麼？','おすすめは何ですか？','Osusume wa nan desu ka'],
+  ['請再來一杯','おかわりお願いします','Okawari onegai shimasu'],
+  ['外帶','持ち帰りで','Mochikaeri de'],
+  ['內用','店内で','Tennai de']]],
+ ['🚃 交通',[
+  ['請問__怎麼去？','__へはどう行きますか？','__ e wa dō ikimasu ka'],
+  ['這班車去__嗎？','この電車は__に行きますか？','Kono densha wa __ ni ikimasu ka'],
+  ['到__要多久？','__までどのくらいかかりますか？','__ made dono kurai kakarimasu ka'],
+  ['下一班幾點？','次は何時ですか？','Tsugi wa nanji desu ka'],
+  ['我要到京都站','京都駅まで行きたいです','Kyōto-eki made ikitai desu'],
+  ['IC 卡可以用嗎？','ICカードは使えますか？','IC kādo wa tsukae masu ka'],
+  ['請叫計程車','タクシーを呼んでください','Takushī wo yonde kudasai'],
+  ['請到這個地址','この住所までお願いします','Kono jūsho made onegai shimasu'],
+  ['這裡可以寄放行李嗎？','ここで荷物を預けられますか？','Koko de nimotsu wo azukeraremasu ka'],
+  ['行李寄物櫃在哪？','コインロッカーはどこですか？','Koin rokkā wa doko desu ka']]],
+ ['🛍️ 購物',[
+  ['這個多少錢？','これはいくらですか？','Kore wa ikura desu ka'],
+  ['可以便宜一點嗎？','少し安くなりますか？','Sukoshi yasuku narimasu ka'],
+  ['我要退稅','免税でお願いします','Menzei de onegai shimasu'],
+  ['有其他顏色嗎？','他の色はありますか？','Hoka no iro wa arimasu ka'],
+  ['可以試穿嗎？','試着できますか？','Shichaku dekimasu ka'],
+  ['請幫我包起來','包んでください','Tsutsunde kudasai'],
+  ['我只是看看','見ているだけです','Mite iru dake desu'],
+  ['有大/小的嗎？','大きい/小さいサイズはありますか？','Ōkii/chīsai saizu wa arimasu ka'],
+  ['請給我袋子','袋をください','Fukuro wo kudasai']]],
+ ['🏨 住宿',[
+  ['Check in 謝謝','チェックインお願いします','Chekkuin onegai shimasu'],
+  ['Check out 謝謝','チェックアウトお願いします','Chekkuauto onegai shimasu'],
+  ['可以寄放行李嗎？','荷物を預けてもいいですか？','Nimotsu wo azukete mo ii desu ka'],
+  ['WiFi 密碼是？','WiFiのパスワードは何ですか？','WiFi no pasuwādo wa nan desu ka'],
+  ['預約名字是__','予約名は__です','Yoyaku-mei wa __ desu']]],
+ ['🗣️ 一般',[
+  ['謝謝','ありがとうございます','Arigatō gozaimasu'],
+  ['不好意思 / 借過','すみません','Sumimasen'],
+  ['廁所在哪裡？','トイレはどこですか？','Toire wa doko desu ka'],
+  ['我不會日語','日本語がわかりません','Nihongo ga wakarimasen'],
+  ['可以說英語嗎？','英語を話せますか？','Eigo wo hanasemasu ka'],
+  ['請幫我拍照','写真を撮ってもらえますか？','Shashin wo totte moraemasu ka'],
+  ['好的 / 沒問題','はい、大丈夫です','Hai, daijōbu desu'],
+  ['不用了，謝謝','大丈夫です','Daijōbu desu'],
+  ['對不起','ごめんなさい','Gomen nasai'],
+  ['你好','こんにちは','Konnichiwa']]]
+];
 
 let RATE=20.6,EXP=[],BK=[],TODO=[],TDDONE={},INFO={},OV={},CUSTOM={},NOTE={},curDay=0,curCat='food',editItemId=null,tdEditId=null,showHidden={},loaded=false;
 
@@ -436,7 +509,8 @@ function renderMoney(){const tot=EXP.reduce((s,e)=>s+e.jpy,0);$('#mTotal').textC
 function addExp(){const v=parseFloat($('#mAmt').value);if(!v||v<=0)return;EXP.unshift({id:Date.now(),jpy:Math.round(v),cat:curCat,day:+$('#mDay').value,note:$('#mNote').value.trim()});$('#mAmt').value='';$('#mNote').value='';$('#mPreview').textContent='';store.set('osk-exp',EXP);renderMoney();}
 
 /* ---- currency ---- */
-function renderFx(){$('#fxRate').textContent='1 HKD = '+RATE+' JPY';$('#fxRateIn').value=RATE;const q=[500,1000,3000,5000,10000,30000],g=$('#fxQuick');g.innerHTML='';q.forEach(x=>{const c=ce('div','qcell');c.innerHTML='<span class="j">¥'+x.toLocaleString()+'</span><span class="h">HK$'+(x/RATE).toFixed(0)+'</span>';g.appendChild(c);});}
+function renderFx(){$('#fxRateLabel').textContent=RATE;$('#fxRateIn').value=RATE;const q=[500,1000,2000,3000,5000,10000,15000,30000],g=$('#fxQuick');g.innerHTML='';q.forEach(x=>{const c=ce('div','qcell');c.innerHTML='<span class="j">¥'+x.toLocaleString()+'</span><span class="h">HK$'+(x/RATE).toFixed(0)+'</span>';g.appendChild(c);});fxMain();}
+function fxMain(){const v=parseFloat($('#fxIn').value);$('#fxOut').textContent=v>0?'HK$'+(v/RATE).toFixed(1):'HK$0';}
 function fxH(){const v=parseFloat($('#fxHkd').value);$('#fxJpy').value=v?(v*RATE).toFixed(0):'';}
 function fxJ(){const v=parseFloat($('#fxJpy').value);$('#fxHkd').value=v?(v/RATE).toFixed(2):'';}
 
@@ -458,15 +532,36 @@ function renderInfo(){
    '<div class="emc"><b>中國駐大阪總領事館</b>（協助港澳居民）：+81 6-6445-9427</div>'+
    '<div class="emc">🏨 <b>飯店日文地址（給計程車看）</b><br>Plum Hotel：〒556-0016 大阪市浪速区元町3-11-22<br>Minn 清水五條：京都市（清水五條）— 詳見收藏地圖連結</div>'+
    '<div class="emc">🛡️ 旅平險緊急電話：請填在上方「訂位/確認」的旅平險欄</div>';
-  const p=$('#phrases');p.innerHTML='';PHRASES.forEach(([zh,jp])=>{const d=ce('div','phrase');d.innerHTML='<span>'+esc(zh)+'</span><span class="jp">'+esc(jp)+'</span>';p.appendChild(d);});
+  const p=$('#phrases');p.innerHTML='';PHRASES.forEach(([cat,items])=>{p.insertAdjacentHTML('beforeend','<div style="font-weight:800;font-size:13px;margin:14px 0 7px;color:var(--ink)">'+cat+'</div>');items.forEach(([zh,jp,rm])=>{const d=ce('div','phrase');d.innerHTML='<div style="flex:1;min-width:0"><span data-t>'+esc(zh)+'</span><div style="font-family:var(--mono);font-size:10.5px;color:#9AA6AF;margin-top:2px">'+esc(rm)+'</div></div><span class="jp">'+esc(jp)+'</span>';p.appendChild(d);});});
 }
 
 /* ---- tabs ---- */
 document.querySelectorAll('nav.tabs button').forEach(b=>{b.onclick=()=>{document.querySelectorAll('nav.tabs button').forEach(x=>x.classList.remove('on'));document.querySelectorAll('section').forEach(x=>x.classList.remove('on'));b.classList.add('on');$('#'+b.dataset.tab).classList.add('on');window.scrollTo({top:0,behavior:'smooth'});};});
 $('#mAdd').onclick=addExp;$('#mAmt').addEventListener('input',()=>{const v=parseFloat($('#mAmt').value);$('#mPreview').textContent=v>0?('≈ HK$'+toHKD(v).toFixed(1)):'';});
-$('#fxUpdate').onclick=()=>{const r=parseFloat($('#fxRateIn').value);if(r>0){RATE=r;store.set('osk-rate',RATE);renderFx();fxH();renderMoney();}};
+$('#fxUpdate').onclick=()=>{const r=parseFloat($('#fxRateIn').value);if(r>0){RATE=r;store.set('osk-rate',RATE);renderFx();renderMoney();}};
+$('#fxIn').addEventListener('input',fxMain);
 $('#fxHkd').addEventListener('input',fxH);$('#fxJpy').addEventListener('input',fxJ);
 $('#bkAdd').onclick=addBk;$('#tdAdd').onclick=addTodo;
+
+/* ---- language toggle (trad↔simp) ---- */
+const T2S_MAP='東東車點從與開訂預約過費確認護買對間號緊準備勾選輕裝專導設變當幫發隊備現獎騎體驗邊選門觀關區點線園場飯電樓層廚據當攝還書機離進價橋齋運覺寫廣來問題買實際過證護時歲個圖應類說產願滿歷時發燒記書裡給話報際術開過後經會對計從類進關選廳經處區間覺費號變個條項輸隊幾備認確訂對間號過費認護買對間號緊準處區開過後經會對計從類進關選處區間覺費號變個條項輸齡預為東車從與開訂預約過費確認護買對間號緊準備勾選輕裝專導變當幫發隊備現體驗邊選門觀關區線場飯電樓層廚據當攝還書機離進價橋運覺寫廣來問題買實際過證護時歲個圖應類說產願滿歷時發燒記書裡給話報際術開過後經會對計從類進關選廳經處區間覺費號變個條項輸齡預為議歸國環寶島攬報護視億萬裝電圖書飼養夠黨農環節險廣應難對該義與體選優單結當專進認觀條標質運設變華鈴製確規組劃價歷雙號橋屬營車達飛陽陣陸傳戰網';
+const S2T_MAP='东东车点从与开订预约过费确认护买对间号紧准备勾选轻装专导设变当帮发队备现奖骑体验边选门观关区点线园场饭电楼层厨据当摄还书机离进价桥斋运觉写广来问题买实际过证护时岁个图应类说产愿满历时发烧记书里给话报际术开过后经会对计从类进关选厅经处区间觉费号变个条项输队几备认确订对间号过费认护买对间号紧准处区开过后经会对计从类进关选处区间觉费号变个条项输龄预为东车从与开订预约过费确认护买对间号紧准备勾选轻装专导变当帮发队备现体验边选门观关区线场饭电楼层厨据当摄还书机离进价桥运觉写广来问题买实际过证护时岁个图应类说产愿满历时发烧记书里给话报际术开过后经会对计从类进关选厅经处区间觉费号变个条项输龄预为议归国环宝岛揽报护视亿万装电图书饲养够党农环节险广应难对该义与体选优单结当专进认观条标质运设变华铃制确规组划价历双号桥属营车达飞阳阵陆传战网';
+let isSimp=false;
+function buildMap(from,to){const m={};for(let i=0;i<from.length;i++)m[from[i]]=to[i];return m;}
+const t2s=buildMap(T2S_MAP,S2T_MAP), s2t=buildMap(S2T_MAP,T2S_MAP);
+function convStr(s,map){return s.split('').map(c=>map[c]||c).join('');}
+function toggleLang(){
+  isSimp=!isSimp;
+  const map=isSimp?t2s:s2t;
+  const btn=$('#langBtn');btn.textContent=isSimp?'简→繁':'繁→簡';
+  /* walk all text nodes */
+  const walk=node=>{if(node.nodeType===3){node.textContent=convStr(node.textContent,map);}
+    else if(node.nodeType===1&&!['SCRIPT','STYLE','INPUT','TEXTAREA','SELECT'].includes(node.tagName)){
+      if(node.placeholder)node.placeholder=convStr(node.placeholder,map);
+      node.childNodes.forEach(walk);}};
+  walk(document.body);
+  store.set('osk-lang',isSimp);
+}
 
 async function init(){
   const r=await store.get('osk-rate');if(typeof r==='number')RATE=r;
@@ -479,7 +574,8 @@ async function init(){
   const cu=await store.get('osk-custom');if(cu&&typeof cu==='object')CUSTOM=cu;
   const nt=await store.get('osk-note');if(nt&&typeof nt==='object')NOTE=nt;
   loaded=true;
-  renderChips();renderDay();renderCats();renderDaySelect();renderMoney();renderFx();fxH();renderBkCatSelect();renderBk();renderTdSecSelect();renderTodo();renderInfo();
+  renderChips();renderDay();renderCats();renderDaySelect();renderMoney();renderFx();renderBkCatSelect();renderBk();renderTdSecSelect();renderTodo();renderInfo();
+  const lang=await store.get('osk-lang');if(lang===true){toggleLang();}
 }
 init();
 </script>
