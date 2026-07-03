@@ -214,9 +214,19 @@ const dirUrl=(f,t,m)=>'https://www.google.com/maps/dir/?api=1&origin='+encodeURI
 function navUrl(stops,mode){const s=stops.slice();const o=s.shift(),d=s.pop();let u='https://www.google.com/maps/dir/?api=1&origin='+encodeURIComponent(o)+'&destination='+encodeURIComponent(d)+'&travelmode='+(mode||'transit');if(s.length)u+='&waypoints='+s.map(encodeURIComponent).join('%7C');return u;}
 const yen=n=>'¥'+Math.round(n).toLocaleString();
 function esc(s){return(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
-const mem={};
-const store={async get(k){try{if(window.storage){const r=await window.storage.get(k);return r?JSON.parse(r.value):null;}}catch(e){}return(k in mem)?mem[k]:null;},async set(k,v){mem[k]=v;try{if(window.storage)await window.storage.set(k,JSON.stringify(v));}catch(e){}}};
-const TYPE={move:{i:'🚃',c:'#3D5A75',l:'交通'},eat:{i:'🍜',c:'#C98A28',l:'美食'},see:{i:'📸',c:'#6E8B57',l:'景點'},shop:{i:'🛍️',c:'#B0568C',l:'購物'},stay:{i:'🏨',c:'#16324F',l:'住宿'},play:{i:'🎟️',c:'#E24A34',l:'體驗'},coffee:{i:'☕',c:'#9A6B3F',l:'早餐'},shrine:{i:'⛩️',c:'#C0392B',l:'神社'},view:{i:'🌆',c:'#7A5EA8',l:'夜景'}};
+/* ---- Supabase shared store ---- */
+const SB_URL='https://lisjaxcdtkydsmjeifke.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxpc2pheGNkdGt5ZHNtamVpZmtlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMwMzA2ODQsImV4cCI6MjA5ODYwNjY4NH0.RCJ_xnRiBSAztdXFiTSfTKONEjrLMzSQPVRLU3ivifM';
+const sbHeaders={'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Prefer':'resolution=merge-duplicates'};
+const cache={};
+const store={
+  async get(k){if(k in cache)return cache[k];
+    try{const r=await fetch(SB_URL+'/rest/v1/shared_store?key=eq.'+encodeURIComponent(k)+'&select=value',{headers:sbHeaders});
+      const d=await r.json();if(d&&d[0]&&d[0].value!=null){cache[k]=d[0].value;return d[0].value;}}catch(e){}
+    try{const v=localStorage.getItem('osk:'+k);if(v!=null){const p=JSON.parse(v);cache[k]=p;return p;}}catch(e){}return null;},
+  async set(k,v){cache[k]=v;try{localStorage.setItem('osk:'+k,JSON.stringify(v));}catch(e){}
+    try{await fetch(SB_URL+'/rest/v1/shared_store',{method:'POST',headers:sbHeaders,body:JSON.stringify({key:k,value:v,updated_at:new Date().toISOString()})});}catch(e){}}
+};const TYPE={move:{i:'🚃',c:'#3D5A75',l:'交通'},eat:{i:'🍜',c:'#C98A28',l:'美食'},see:{i:'📸',c:'#6E8B57',l:'景點'},shop:{i:'🛍️',c:'#B0568C',l:'購物'},stay:{i:'🏨',c:'#16324F',l:'住宿'},play:{i:'🎟️',c:'#E24A34',l:'體驗'},coffee:{i:'☕',c:'#9A6B3F',l:'早餐'},shrine:{i:'⛩️',c:'#C0392B',l:'神社'},view:{i:'🌆',c:'#7A5EA8',l:'夜景'}};
 
 const DAYS=[
 {date:'7/14',dow:'二',city:'大阪 · 抵達',tag:'抵達日',
