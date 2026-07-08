@@ -135,6 +135,8 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--ink);outline-off
 .img-cap-section{margin-top:10px}
 .img-cap-section h4{margin:0 0 8px;font-size:12px;font-weight:700;color:var(--ink2)}
 .cap-row{display:flex;gap:6px;margin-bottom:6px}
+
+.cur-on{background:var(--ink)!important;color:#fff!important;border-color:var(--ink)!important}
 </style>
 </head>
 <body>
@@ -159,7 +161,8 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--ink);outline-off
     <section id="money">
       <div class="hero"><div class="lbl">目前總花費</div><div class="big" id="mTotal">¥0</div><div class="sub" id="mTotalHk">≈ HK$0</div></div>
       <div class="panel"><h3>➕ 新增一筆</h3>
-        <div class="row" style="margin-bottom:10px"><div style="position:relative;flex:1"><span style="position:absolute;left:10px;top:10px;font-family:var(--mono);color:#9AA6AF">¥</span><input id="mAmt" inputmode="decimal" placeholder="金額" style="width:100%;padding-left:22px;font-family:var(--mono);font-size:16px"></div><select id="mDay" style="flex:0 0 94px"></select></div>
+        <div class="row" style="margin-bottom:10px"><div style="position:relative;flex:1"><span id="mCurSym" style="position:absolute;left:10px;top:10px;font-family:var(--mono);color:#9AA6AF">¥</span><input id="mAmt" inputmode="decimal" placeholder="金額" style="width:100%;padding-left:22px;font-family:var(--mono);font-size:16px"></div><input type="date" id="mDay" style="flex:0 0 120px;font-size:12px" value="2026-07-14"></div>
+        <div style="display:flex;gap:6px;margin-bottom:10px"><button class="catbtn" id="curJPY" style="background:var(--ink);color:#fff;border-color:var(--ink)">¥ 日圓</button><button class="catbtn" id="curHKD">HK$ 港幣</button></div>
         <input id="mTitle" placeholder="標題（如：一蘭拉麵）" style="width:100%;font-size:13px;margin-bottom:8px">
         <div class="catrow" id="mCats"></div>
         <input id="mNote" placeholder="描述（可空）" style="width:100%;font-size:13px;margin-bottom:8px">
@@ -587,13 +590,51 @@ function addCustom(di){CUSTOM[di]=CUSTOM[di]||[];CUSTOM[di].push({t:'',title:'�
 /* ---- expenses ---- */
 function toHKD(j){return j/RATE;}
 function renderCats(){const c=$('#mCats');c.innerHTML='';CATS.forEach(([k,l,col])=>{const b=ce('button','catbtn');b.textContent=l;if(k===curCat){b.style.background=col;b.style.color='#fff';b.style.borderColor=col;}b.onclick=()=>{curCat=k;renderCats();};c.appendChild(b);});}
-function renderDaySelect(){const s=$('#mDay');s.innerHTML='';DAYS.forEach((d,i)=>{const o=ce('option');o.value=i;o.textContent=d.date;s.appendChild(o);});}
-function svgBar(data){const H=170,pad=24,n=data.length,max=Math.max(1,...data.map(d=>d.v)),bw=(100-8)/n;let b='',l='';data.forEach((d,i)=>{const x=4+i*bw,bh=(H-pad-8)*(d.v/max),y=H-pad-bh;b+='<rect x="'+(x+bw*0.15)+'" y="'+y+'" width="'+(bw*0.7)+'" height="'+bh+'" rx="1.4" fill="#16324F"></rect>';l+='<text x="'+(x+bw/2)+'" y="'+(H-pad+13)+'" font-size="6.5" text-anchor="middle" fill="#3D5A75">'+d.n+'</text>';if(d.v>0)l+='<text x="'+(x+bw/2)+'" y="'+(y-3)+'" font-size="5.6" text-anchor="middle" fill="#9AA6AF">'+Math.round(d.v/1000)+'k</text>';});return '<svg viewBox="0 0 100 '+H+'" preserveAspectRatio="none" style="width:100%;height:180px">'+b+l+'</svg>';}
+function renderDaySelect(){/* date picker — set default to today or trip start */
+const today=new Date().toISOString().split('T')[0];$('#mDay').value=today>='2026-07-14'&&today<='2026-07-19'?today:'2026-07-14';}
+function svgBar(data){const H=170,pad=24,n=data.length,max=Math.max(1,...data.map(d=>d.v)),bw=(100-8)/n;let b='',l='';data.forEach((d,i)=>{const x=4+i*bw,bh=(H-pad-8)*(d.v/max),y=H-pad-bh;b+='<rect x="'+(x+bw*0.15)+'" y="'+y+'" width="'+(bw*0.7)+'" height="'+bh+'" rx="1.4" fill="#16324F"></rect>';l+='<text x="'+(x+bw/2)+'" y="'+(H-pad+13)+'" font-size="6.5" text-anchor="middle" fill="#3D5A75">'+d.n+'</text>';if(d.v>0)l+='<text x="'+(x+bw/2)+'" y="'+(y-3)+'" font-size="5.6" text-anchor="middle" fill="#9AA6AF">'+Math.round(d.v/1000)+'k</text>';});return '<svg viewBox="0 0 100 '+H+'" preserveAspectRatio="xMidYMid meet" style="width:100%;height:180px;display:block">'+b+l+'</svg>';}
 function svgPie(data){const cx=50,cy=50,r=38,ri=20;let s='';const tot=data.reduce((a,d)=>a+d.v,0)||1;let a=-Math.PI/2;data.forEach(d=>{const ang=d.v/tot*Math.PI*2,a2=a+ang,x1=cx+r*Math.cos(a),y1=cy+r*Math.sin(a),x2=cx+r*Math.cos(a2),y2=cy+r*Math.sin(a2),xi2=cx+ri*Math.cos(a2),yi2=cy+ri*Math.sin(a2),xi1=cx+ri*Math.cos(a),yi1=cy+ri*Math.sin(a),lg=ang>Math.PI?1:0;s+='<path d="M'+x1+' '+y1+' A'+r+' '+r+' 0 '+lg+' 1 '+x2+' '+y2+' L'+xi2+' '+yi2+' A'+ri+' '+ri+' 0 '+lg+' 0 '+xi1+' '+yi1+' Z" fill="'+d.c+'"></path>';a=a2;});return '<svg viewBox="0 0 100 100" style="width:100%;height:150px">'+s+'</svg>';}
-function renderMoney(){const tot=EXP.reduce((s,e)=>s+e.jpy,0);$('#mTotal').textContent=yen(tot);$('#mTotalHk').textContent='≈ HK$'+toHKD(tot).toFixed(0)+'（匯率 '+RATE+'）';const byDay=DAYS.map((d,i)=>({n:d.date.split('/')[1],v:EXP.filter(e=>e.day===i).reduce((s,e)=>s+e.jpy,0)}));const byCat=CATS.map(([k,l,c])=>({n:l,c,v:EXP.filter(e=>e.cat===k).reduce((s,e)=>s+e.jpy,0)})).filter(x=>x.v>0);let ch='';if(EXP.length){ch+='<div class="panel"><h3>💰 每日花費（¥）</h3>'+svgBar(byDay)+'</div>';if(byCat.length){ch+='<div class="panel"><h3>🥧 分類佔比</h3><div style="display:flex;align-items:center;gap:8px"><div style="width:52%">'+svgPie(byCat)+'</div><div style="flex:1">';byCat.forEach(c=>{ch+='<div style="display:flex;align-items:center;gap:7px;font-size:12px;margin-bottom:5px"><span class="dot" style="background:'+c.c+'"></span><span style="flex:1;color:#3D5A75">'+c.n+'</span><span style="font-family:var(--mono);font-weight:600">'+yen(c.v)+'</span></div>';});ch+='</div></div></div>';}}$('#mCharts').innerHTML=ch;$('#mCount').textContent='明細（'+EXP.length+'）';const L=$('#mList');if(!EXP.length){L.innerHTML='<div class="empty">還沒有紀錄。玩到哪、花到哪，隨手記一筆吧。</div>';return;}L.innerHTML='';EXP.forEach(e=>{const cat=CATS.find(c=>c[0]===e.cat)||CATS[5];const row=ce('div','exp');let titleHtml=e.title?esc(e.title):cat[1];let descHtml=e.note?' <span style="color:#9AA6AF;font-weight:400">· '+esc(e.note)+'</span>':'';let imgHtml='';if(e.imgs&&e.imgs.length){imgHtml='<div class="exp-imgs">';e.imgs.forEach(src=>{imgHtml+='<img class="exp-thumb" src="'+src+'" onclick="openLb(this.src)">';});imgHtml+='</div>';}row.innerHTML='<span class="dot" style="background:'+cat[2]+'"></span><div style="flex:1;min-width:0"><div style="font-size:13.5px;font-weight:600">'+titleHtml+descHtml+'</div><div style="font-family:var(--mono);font-size:11px;color:#9AA6AF">'+DAYS[e.day].date+' · '+cat[1]+'</div>'+imgHtml+'</div><div><div class="amt">'+yen(e.jpy)+'</div><div class="hk">HK$'+toHKD(e.jpy).toFixed(0)+'</div></div>';const del=ce('button','del');del.textContent='🗑';del.onclick=()=>{EXP=EXP.filter(x=>x.id!==e.id);store.set('osk-exp',EXP);renderMoney();};row.appendChild(del);L.appendChild(row);});}
+function getExpHkd(e){return e.hkd!=null?e.hkd:Math.round((e.jpy||0)/RATE);}
+function getExpJpy(e){return e.jpy||0;}
+function getExpDate(e){return e.date||DAYS[e.day||0].date;}
+function isPreTrip(e){const d=e.date||'';return d<'2026-07-14';}
+function renderMoney(){
+const totHkd=EXP.reduce((s,e)=>s+getExpHkd(e),0);
+$('#mTotal').textContent='HK$'+totHkd.toLocaleString();
+$('#mTotalHk').textContent='≈ ¥'+(totHkd*RATE).toFixed(0)+'（匯率 '+RATE+'）';
+/* chart: trip days only */
+const tripDates=['2026-07-14','2026-07-15','2026-07-16','2026-07-17','2026-07-18','2026-07-19'];
+const byDay=tripDates.map(dt=>{const label=dt.split('-')[2];const v=EXP.filter(e=>(e.date||'')==dt||(e.date==null&&DAYS[e.day||0]&&DAYS[e.day||0].date==(dt.slice(5).replace('-','/'))))
+.reduce((s,e)=>s+getExpHkd(e),0);return{n:label,v};});
+const byCat=CATS.map(([k,l,c])=>({n:l,c,v:EXP.filter(e=>e.cat===k).reduce((s,e)=>s+getExpHkd(e),0)})).filter(x=>x.v>0);
+let ch='';if(EXP.length){ch+='<div class="panel"><h3>💰 每日花費（HK$）</h3>'+svgBar(byDay)+'</div>';
+if(byCat.length){ch+='<div class="panel"><h3>🥧 分類佔比</h3><div style="display:flex;align-items:center;gap:8px"><div style="width:52%">'+svgPie(byCat)+'</div><div style="flex:1">';byCat.forEach(c=>{ch+='<div style="display:flex;align-items:center;gap:7px;font-size:12px;margin-bottom:5px"><span class="dot" style="background:'+c.c+'"></span><span style="flex:1;color:#3D5A75">'+c.n+'</span><span style="font-family:var(--mono);font-weight:600">HK$'+c.v+'</span></div>';});ch+='</div></div></div>';}}
+$('#mCharts').innerHTML=ch;$('#mCount').textContent='明細（'+EXP.length+'）';
+const L=$('#mList');if(!EXP.length){L.innerHTML='<div class="empty">還沒有紀錄。玩到哪、花到哪，隨手記一筆吧。</div>';return;}L.innerHTML='';EXP.forEach(e=>{const cat=CATS.find(c=>c[0]===e.cat)||CATS[5];const row=ce('div','exp');
+let titleHtml=e.title?esc(e.title):cat[1];
+let descHtml=e.note?' <span style="color:#9AA6AF;font-weight:400">· '+esc(e.note)+'</span>':'';
+let imgHtml='';if(e.imgs&&e.imgs.length){imgHtml='<div class="exp-imgs">';e.imgs.forEach(src=>{imgHtml+='<img class="exp-thumb" src="'+src+'" onclick="openLb(this.src)">';});imgHtml+='</div>';}
+/* date display */
+let dateStr=getExpDate(e);if(typeof dateStr==='string'&&dateStr.includes('-'))dateStr=dateStr.slice(5).replace('-','/');
+let preTripBadge=isPreTrip(e)?'<span style="background:#F3E3DF;color:var(--red);font-size:10px;padding:1px 5px;border-radius:4px;margin-left:4px">出發前</span>':'';
+/* currency display */
+let amtPrimary,amtSecondary;
+if(e.cur==='HKD'){amtPrimary='HK$'+e.amt;amtSecondary='≈ ¥'+getExpJpy(e);}
+else{amtPrimary=yen(getExpJpy(e));amtSecondary='≈ HK$'+getExpHkd(e);}
+row.innerHTML='<span class="dot" style="background:'+cat[2]+'"></span><div style="flex:1;min-width:0"><div style="font-size:13.5px;font-weight:600">'+titleHtml+descHtml+'</div><div style="font-family:var(--mono);font-size:11px;color:#9AA6AF">'+dateStr+' · '+cat[1]+preTripBadge+'</div>'+imgHtml+'</div><div style="text-align:right"><div class="amt">'+amtPrimary+'</div><div class="hk">'+amtSecondary+'</div></div>';
+const del=ce('button','del');del.textContent='🗑';del.onclick=()=>{EXP=EXP.filter(x=>x.id!==e.id);store.set('osk-exp',EXP);renderMoney();};row.appendChild(del);L.appendChild(row);});}
 let pendExpImgs=[];
+let curCurrency='JPY';
+function setCurrency(c){curCurrency=c;const j=$('#curJPY'),h=$('#curHKD'),sym=$('#mCurSym');if(c==='JPY'){j.className='catbtn cur-on';h.className='catbtn';sym.textContent='¥';}else{h.className='catbtn cur-on';j.className='catbtn';sym.textContent='HK$';}}
+
 $('#mExpFile').onchange=e=>{[...e.target.files].forEach(f=>fileToDataURL(f,d=>{pendExpImgs.push(d);const im=ce('img','exp-thumb');im.src=d;$('#mExpImgPreview').appendChild(im);$('#mExpImgCount').textContent=pendExpImgs.length+'張';}));};
-function addExp(){const v=parseFloat($('#mAmt').value);if(!v||v<=0)return;EXP.unshift({id:Date.now(),jpy:Math.round(v),cat:curCat,day:+$('#mDay').value,title:($('#mTitle').value||'').trim(),note:$('#mNote').value.trim(),imgs:pendExpImgs.slice()});$('#mAmt').value='';$('#mTitle').value='';$('#mNote').value='';$('#mPreview').textContent='';pendExpImgs=[];$('#mExpImgPreview').innerHTML='';$('#mExpImgCount').textContent='';store.set('osk-exp',EXP);renderMoney();}
+function addExp(){const v=parseFloat($('#mAmt').value);if(!v||v<=0)return;
+const dateVal=$('#mDay').value;
+const amt=Math.round(v);
+const hkd=curCurrency==='HKD'?amt:Math.round(amt/RATE);
+const jpy=curCurrency==='JPY'?amt:Math.round(amt*RATE);
+EXP.unshift({id:Date.now(),amt,cur:curCurrency,hkd,jpy,cat:curCat,date:dateVal,title:($('#mTitle').value||'').trim(),note:$('#mNote').value.trim(),imgs:pendExpImgs.slice()});
+$('#mAmt').value='';$('#mTitle').value='';$('#mNote').value='';$('#mPreview').textContent='';pendExpImgs=[];$('#mExpImgPreview').innerHTML='';$('#mExpImgCount').textContent='';store.set('osk-exp',EXP);renderMoney();}
 
 /* ---- currency ---- */
 function renderFx(){$('#fxRateLabel').textContent=RATE;$('#fxRateIn').value=RATE;const q=[500,1000,2000,3000,5000,10000,15000,30000],g=$('#fxQuick');g.innerHTML='';q.forEach(x=>{const c=ce('div','qcell');c.innerHTML='<span class="j">¥'+x.toLocaleString()+'</span><span class="h">HK$'+(x/RATE).toFixed(0)+'</span>';g.appendChild(c);});fxMain();}
@@ -624,7 +665,8 @@ function renderInfo(){
 
 /* ---- tabs ---- */
 document.querySelectorAll('nav.tabs button').forEach(b=>{b.onclick=()=>{document.querySelectorAll('nav.tabs button').forEach(x=>x.classList.remove('on'));document.querySelectorAll('section').forEach(x=>x.classList.remove('on'));b.classList.add('on');$('#'+b.dataset.tab).classList.add('on');window.scrollTo({top:0,behavior:'smooth'});};});
-$('#mAdd').onclick=addExp;$('#mAmt').addEventListener('input',()=>{const v=parseFloat($('#mAmt').value);$('#mPreview').textContent=v>0?('≈ HK$'+toHKD(v).toFixed(1)):'';});
+$('#mAdd').onclick=addExp;
+$('#curJPY').onclick=()=>setCurrency('JPY');$('#curHKD').onclick=()=>setCurrency('HKD');$('#mAmt').addEventListener('input',()=>{const v=parseFloat($('#mAmt').value);if(v>0){if(curCurrency==='JPY')$('#mPreview').textContent='≈ HK$'+(v/RATE).toFixed(1);else $('#mPreview').textContent='≈ ¥'+(v*RATE).toFixed(0);}else{$('#mPreview').textContent='';}});
 $('#fxUpdate').onclick=()=>{const r=parseFloat($('#fxRateIn').value);if(r>0){RATE=r;store.set('osk-rate',RATE);renderFx();renderMoney();}};
 $('#fxIn').addEventListener('input',fxMain);
 $('#fxHkd').addEventListener('input',fxH);$('#fxJpy').addEventListener('input',fxJ);
