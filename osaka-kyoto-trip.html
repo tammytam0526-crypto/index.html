@@ -137,7 +137,24 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--ink);outline-off
 .cap-row{display:flex;gap:6px;margin-bottom:6px}
 
 .cur-on{background:var(--ink)!important;color:#fff!important;border-color:var(--ink)!important}
+.ocr-status{font-size:11px;color:var(--gold);margin:6px 0;min-height:16px}
+.ocr-status.err{color:var(--red)}
+.exp-edit{background:#F8F5EF;border-radius:10px;padding:10px 12px;margin-top:6px;display:flex;flex-direction:column;gap:6px}
+.exp-edit label{font-size:11px;color:var(--ink2);font-weight:600;margin:0}
+.exp-edit input,.exp-edit select,.exp-edit textarea{font-size:13px;padding:6px 8px;border:1px solid var(--line);border-radius:6px;background:#fff}
+.exp-edit .ee-row{display:flex;gap:6px;align-items:center}
+.exp-edit .ee-cats{display:flex;flex-wrap:wrap;gap:4px}
+.exp-edit .ee-cat{font-size:11px;padding:3px 8px;border-radius:12px;border:1px solid var(--line);background:#fff;cursor:pointer}
+.exp-edit .ee-cat.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.exp-edit .ee-btns{display:flex;gap:6px;margin-top:4px}
+.exp-edit .ee-save{background:var(--ink);color:#fff;border:none;padding:6px 16px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer}
+.payer-filter-btn{font-size:11px;padding:4px 10px;border-radius:12px;border:1px solid var(--line);background:#fff;cursor:pointer;font-weight:500;color:var(--ink2)}
+.payer-filter-btn.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.payer-badge{font-size:10px;color:var(--ink2);background:#E8EDF1;padding:1px 6px;border-radius:4px;margin-left:4px;font-weight:500}
+.exp-edit .ee-cancel{background:var(--line);color:var(--ink2);border:none;padding:6px 16px;border-radius:6px;font-size:12px;cursor:pointer}
+.exp.editing{border:1.5px solid var(--gold);border-radius:10px}
 </style>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 </head>
 <body>
 <div class="wrap">
@@ -161,15 +178,18 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--ink);outline-off
     <section id="money">
       <div class="hero"><div class="lbl">目前總花費</div><div class="big" id="mTotal">¥0</div><div class="sub" id="mTotalHk">≈ HK$0</div></div>
       <div class="panel"><h3>➕ 新增一筆</h3>
-        <div class="row" style="margin-bottom:10px"><div style="position:relative;flex:1"><span id="mCurSym" style="position:absolute;left:10px;top:10px;font-family:var(--mono);color:#9AA6AF">¥</span><input id="mAmt" inputmode="decimal" placeholder="金額" style="width:100%;padding-left:22px;font-family:var(--mono);font-size:16px"></div><input type="date" id="mDay" style="flex:0 0 120px;font-size:12px" value="2026-07-14"></div>
+        <div class="row" style="margin-bottom:10px"><div style="position:relative;flex:1"><span id="mCurSym" style="position:absolute;left:10px;top:10px;font-family:var(--mono);color:#9AA6AF">¥</span><input id="mAmt" inputmode="decimal" placeholder="金額" style="width:100%;padding-left:22px;font-family:var(--mono);font-size:16px"></div><select id="mPayer" style="flex:0 0 70px;font-size:12px"><option value="媽媽">媽媽</option><option value="vivien">vivien</option><option value="tammy">tammy</option><option value="billy">billy</option><option value="穎瑜">穎瑜</option></select><input type="date" id="mDay" style="flex:0 0 120px;font-size:12px" value="2026-07-14"></div>
         <div style="display:flex;gap:6px;margin-bottom:10px"><button class="catbtn" id="curJPY" style="background:var(--ink);color:#fff;border-color:var(--ink)">¥ 日圓</button><button class="catbtn" id="curHKD">HK$ 港幣</button></div>
         <input id="mTitle" placeholder="標題（如：一蘭拉麵）" style="width:100%;font-size:13px;margin-bottom:8px">
         <div class="catrow" id="mCats"></div>
         <input id="mNote" placeholder="描述（可空）" style="width:100%;font-size:13px;margin-bottom:8px">
         <div style="margin-bottom:8px"><label class="filebtn" style="font-size:12px">📷 附圖片<input type="file" accept="image/*" multiple style="display:none" id="mExpFile"></label><span id="mExpImgCount" style="font-size:11px;color:#9AA6AF;margin-left:8px"></span></div>
         <div id="mExpImgPreview" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px"></div>
+        <div id="ocrStatus" class="ocr-status"></div>
         <div class="row"><div id="mPreview" style="font-family:var(--mono);font-size:12px;color:var(--gold);flex:1"></div><button class="addbtn" id="mAdd">加入</button></div></div>
       <div id="mCharts"></div>
+      <div id="payerFilter" style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px"></div>
+      <div id="payerTotal" style="font-size:12px;color:var(--gold);font-weight:600;margin-bottom:8px;min-height:16px"></div>
       <div style="font-weight:700;font-size:13.5px;margin-bottom:8px;color:var(--ink2)" id="mCount">明細</div><div id="mList"></div>
     </section>
     <section id="fx">
@@ -374,6 +394,7 @@ const TODO_SEED=[
 ];
 const SEC_ORDER=['出發前','7/14','7/15','7/16','7/17','7/18','7/19','每日提醒'];
 const CATS=[['food','餐飲','#C98A28'],['transit','交通','#3D5A75'],['shop','購物','#B0568C'],['ticket','門票景點','#E24A34'],['stay','住宿','#16324F'],['other','其他','#6E8B57']];
+const PAYERS=['媽媽','vivien','tammy','billy','穎瑜'];
 const INFO_FIELDS=[['flight','✈️ 航班號 / 時間'],['car','🚗 專車接送（司機/聯絡）'],['usj','🎟️ USJ 門票號 / 快速通關'],['kimono','👘 和服 一番星（預約時間/編號）'],['plum','🏨 Plum Hotel 確認碼'],['minn','🏯 Minn 清水五條 確認碼'],['haruka','🚄 Haruka 特急券'],['insurance','🛡️ 旅平險（保單/緊急電話）']];
 const PHRASES=[
  ['🍽️ 餐廳',[
@@ -433,7 +454,7 @@ const PHRASES=[
   ['你好','こんにちは','Konnichiwa']]]
 ];
 
-let RATE=20.6,EXP=[],BK=[],TODO=[],TDDONE={},INFO={},OV={},CUSTOM={},NOTE={},curDay=0,curCat='food',editItemId=null,tdEditId=null,showHidden={},loaded=false;
+let RATE=20.6,EXP=[],BK=[],TODO=[],TDDONE={},INFO={},OV={},CUSTOM={},NOTE={},curDay=0,curCat='food',filterPayer='all',editItemId=null,tdEditId=null,showHidden={},loaded=false;
 
 function openLb(s){$('#lbImg').src=s;$('#lb').classList.add('on');}
 function closeLb(){$('#lb').classList.remove('on');}
@@ -549,7 +570,7 @@ function renderCustom(di,ci,c){
 function editForm(di,idx,it,isCustom){
   const box=ce('div','edform');const imgs=isCustom?((it.add||[]).map((src,j)=>({src,kind:'add',ref:'a:'+j}))):itemImages(it);
   let ih='';imgs.forEach(im=>ih+='<div class="imgwrap"><img class="thumb" src="'+im.src+'"><button class="imgx" data-ref="'+im.ref+'">×</button></div>');
-  box.innerHTML='<label>時間（輸入後自動排序）</label><input class="e-t" type="time" value="'+esc(it.t||'')+'"><label>標題</label><input class="e-title" value="'+esc(it.title||'')+'"><label>說明文字</label><textarea class="e-intro">'+esc(it.intro||'')+'</textarea><label>圖片（點 × 移除）</label><div class="imgs" style="flex-direction:row;flex-wrap:wrap">'+ih+'</div><div class="edrow"><label class="filebtn">➕ 從相簿加照片<input type="file" accept="image/*" multiple style="display:none" class="e-file"></label></div><div class="img-cap-section"><h4>📷 貼圖片網址</h4><div class="cap-row"><input class="e-url" placeholder="https://...jpg" style="flex:1"><input class="e-cap" placeholder="圖片說明（可空）" style="flex:1"><button class="edbtn edcancel e-addurl">加入</button></div></div><div class="link-section"><h4>🔗 新增連結按鈕</h4><div class="link-row"><input class="e-linkname" placeholder="按鈕名稱" style="flex:1"><input class="e-linkurl" placeholder="https://..." style="flex:1"><button class="edbtn edcancel e-addlink">加入</button></div><div class="link-list e-linklist"></div></div>';
+  box.innerHTML='<label>時間（輸入後自動排序）</label><input class="e-t" type="time" value="'+esc(it.t||'')+'"><label>標題</label><input class="e-title" value="'+esc(it.title||'')+'"><label>說明文字</label><textarea class="e-intro">'+esc(it.intro||'')+'</textarea><label>圖片（點 × 移除）</label><div class="imgs" style="flex-direction:row;flex-wrap:wrap">'+ih+'</div><div class="edrow"><label class="filebtn">➕ 從相簿加照片<input type="file" accept="image/*" multiple style="display:none" class="e-file"></label></div><div class="link-section"><h4>🔗 新增連結按鈕</h4><div class="link-row"><input class="e-linkname" placeholder="按鈕名稱" style="flex:1"><input class="e-linkurl" placeholder="https://..." style="flex:1"><button class="edbtn edcancel e-addlink">加入</button></div><div class="link-list e-linklist"></div></div>';
   const row=ce('div','edrow');
   const save=ce('button','edbtn edsave');save.textContent='💾 儲存';
   const cancel=ce('button','edbtn edcancel');cancel.textContent='取消';
@@ -561,7 +582,7 @@ function editForm(di,idx,it,isCustom){
   let pendAdd=[],pendRm=[];
   box.querySelectorAll('.imgx').forEach(b=>b.onclick=()=>{pendRm.push(b.dataset.ref);b.parentNode.style.display='none';});
   box.querySelector('.e-file').onchange=e=>{[...e.target.files].forEach(f=>fileToDataURL(f,d=>{pendAdd.push(d);const w=ce('div','imgwrap');w.innerHTML='<img class="thumb" src="'+d+'">';box.querySelector('.imgs').appendChild(w);}));};
-  box.querySelector('.e-addurl').onclick=()=>{const u=box.querySelector('.e-url').value.trim();if(/^https?:\/\//.test(u)){pendAdd.push(u);const w=ce('div','imgwrap');w.innerHTML='<img class="thumb" src="'+u+'">';box.querySelector('.imgs').appendChild(w);box.querySelector('.e-url').value='';}};
+
   /* emoji picker */
   if(isCustom){const ep=createEmojiPicker(it.emoji||'📌',em=>{it.emoji=em;});box.querySelector('.edrow').insertAdjacentElement('afterbegin',ep);}
   /* link buttons */
@@ -599,41 +620,109 @@ function getExpJpy(e){return e.jpy||0;}
 function getExpDate(e){return e.date||DAYS[e.day||0].date;}
 function isPreTrip(e){const d=e.date||'';return d<'2026-07-14';}
 function renderMoney(){
-const totHkd=EXP.reduce((s,e)=>s+getExpHkd(e),0);
+const fp=filterPayer;
+const fEXP=fp==='all'?EXP:EXP.filter(e=>(e.payer||'媽媽')===fp);
+const totHkd=fEXP.reduce((s,e)=>s+getExpHkd(e),0);
 $('#mTotal').textContent='HK$'+totHkd.toLocaleString();
 $('#mTotalHk').textContent='≈ ¥'+(totHkd*RATE).toFixed(0)+'（匯率 '+RATE+'）';
-/* chart: trip days only */
+/* chart: trip days only, filtered */
 const tripDates=['2026-07-14','2026-07-15','2026-07-16','2026-07-17','2026-07-18','2026-07-19'];
-const byDay=tripDates.map(dt=>{const label=dt.split('-')[2];const v=EXP.filter(e=>(e.date||'')==dt||(e.date==null&&DAYS[e.day||0]&&DAYS[e.day||0].date==(dt.slice(5).replace('-','/'))))
+const byDay=tripDates.map(dt=>{const label=dt.split('-')[2];const v=fEXP.filter(e=>(e.date||'')==dt||(e.date==null&&DAYS[e.day||0]&&DAYS[e.day||0].date==(dt.slice(5).replace('-','/'))))
 .reduce((s,e)=>s+getExpHkd(e),0);return{n:label,v};});
-const byCat=CATS.map(([k,l,c])=>({n:l,c,v:EXP.filter(e=>e.cat===k).reduce((s,e)=>s+getExpHkd(e),0)})).filter(x=>x.v>0);
-let ch='';if(EXP.length){ch+='<div class="panel"><h3>💰 每日花費（HK$）</h3>'+svgBar(byDay)+'</div>';
+const byCat=CATS.map(([k,l,c])=>({n:l,c,v:fEXP.filter(e=>e.cat===k).reduce((s,e)=>s+getExpHkd(e),0)})).filter(x=>x.v>0);
+let ch='';if(fEXP.length){ch+='<div class="panel"><h3>💰 每日花費（HK$）</h3>'+svgBar(byDay)+'</div>';
 if(byCat.length){ch+='<div class="panel"><h3>🥧 分類佔比</h3><div style="display:flex;align-items:center;gap:8px"><div style="width:52%">'+svgPie(byCat)+'</div><div style="flex:1">';byCat.forEach(c=>{ch+='<div style="display:flex;align-items:center;gap:7px;font-size:12px;margin-bottom:5px"><span class="dot" style="background:'+c.c+'"></span><span style="flex:1;color:#3D5A75">'+c.n+'</span><span style="font-family:var(--mono);font-weight:600">HK$'+c.v+'</span></div>';});ch+='</div></div></div>';}}
-$('#mCharts').innerHTML=ch;$('#mCount').textContent='明細（'+EXP.length+'）';
-const L=$('#mList');if(!EXP.length){L.innerHTML='<div class="empty">還沒有紀錄。玩到哪、花到哪，隨手記一筆吧。</div>';return;}L.innerHTML='';EXP.forEach(e=>{const cat=CATS.find(c=>c[0]===e.cat)||CATS[5];const row=ce('div','exp');
+$('#mCharts').innerHTML=ch;
+/* payer filter buttons */
+let pf='';['all'].concat(PAYERS).forEach(p=>{const label=p==='all'?'全部':p;const on=fp===p?' on':'';pf+='<button class="payer-filter-btn'+on+'" data-p="'+p+'">'+label+'</button>';});
+$('#payerFilter').innerHTML=pf;
+$('#payerFilter').querySelectorAll('.payer-filter-btn').forEach(b=>{b.onclick=()=>{filterPayer=b.dataset.p;renderMoney();};});
+/* payer total display */
+if(fp!=='all'){$('#payerTotal').textContent=fp+' 總花費：HK$'+totHkd.toLocaleString();}else{$('#payerTotal').textContent='';}
+$('#mCount').textContent='明細（'+fEXP.length+'）';
+const L=$('#mList');if(!fEXP.length){L.innerHTML='<div class="empty">'+(fp==='all'?'還沒有紀錄。玩到哪、花到哪，隨手記一筆吧。':fp+' 還沒有花費紀錄')+'</div>';return;}L.innerHTML='';fEXP.forEach((e,ei)=>{const cat=CATS.find(c=>c[0]===e.cat)||CATS[5];const row=ce('div','exp'+(editExpId===e.id?' editing':''));
 let titleHtml=e.title?esc(e.title):cat[1];
 let descHtml=e.note?' <span style="color:#9AA6AF;font-weight:400">· '+esc(e.note)+'</span>':'';
-let imgHtml='';if(e.imgs&&e.imgs.length){imgHtml='<div class="exp-imgs">';e.imgs.forEach(src=>{imgHtml+='<img class="exp-thumb" src="'+src+'" onclick="openLb(this.src)">';});imgHtml+='</div>';}
-/* date display */
+let imgHtml='';if(e.imgs&&e.imgs.length){imgHtml='<div class="exp-imgs">';e.imgs.forEach(src=>{imgHtml+='<img class="exp-thumb" src="'+src+'" onclick="event.stopPropagation();openLb(this.src)">';});imgHtml+='</div>';}
 let dateStr=getExpDate(e);if(typeof dateStr==='string'&&dateStr.includes('-'))dateStr=dateStr.slice(5).replace('-','/');
 let preTripBadge=isPreTrip(e)?'<span style="background:#F3E3DF;color:var(--red);font-size:10px;padding:1px 5px;border-radius:4px;margin-left:4px">出發前</span>':'';
-/* currency display */
 let amtPrimary,amtSecondary;
 if(e.cur==='HKD'){amtPrimary='HK$'+e.amt;amtSecondary='≈ ¥'+getExpJpy(e);}
 else{amtPrimary=yen(getExpJpy(e));amtSecondary='≈ HK$'+getExpHkd(e);}
+const payerBadge=e.payer?'<span class="payer-badge">'+esc(e.payer)+'</span>':'';
 row.innerHTML='<span class="dot" style="background:'+cat[2]+'"></span><div style="flex:1;min-width:0"><div style="font-size:13.5px;font-weight:600">'+titleHtml+descHtml+'</div><div style="font-family:var(--mono);font-size:11px;color:#9AA6AF">'+dateStr+' · '+cat[1]+preTripBadge+'</div>'+imgHtml+'</div><div style="text-align:right"><div class="amt">'+amtPrimary+'</div><div class="hk">'+amtSecondary+'</div></div>';
-const del=ce('button','del');del.textContent='🗑';del.onclick=()=>{EXP=EXP.filter(x=>x.id!==e.id);store.set('osk-exp',EXP);renderMoney();};row.appendChild(del);L.appendChild(row);});}
+const del=ce('button','del');del.textContent='🗑';del.onclick=ev=>{ev.stopPropagation();EXP=EXP.filter(x=>x.id!==e.id);store.set('osk-exp',EXP);renderMoney();};row.appendChild(del);
+/* click to toggle inline edit */
+row.style.cursor='pointer';row.onclick=()=>{editExpId=editExpId===e.id?null:e.id;renderMoney();};
+L.appendChild(row);
+/* inline edit panel */
+if(editExpId===e.id){const ed=ce('div','exp-edit');
+let catBtns='';CATS.forEach(([k,l,c])=>{catBtns+='<button class="ee-cat'+(k===e.cat?' on':'')+'" data-k="'+k+'">'+l+'</button>';});
+ed.innerHTML='<label>標題</label><input class="ee-title" value="'+esc(e.title||'')+'">'
++'<div class="ee-row"><div style="flex:1"><label>金額</label><input class="ee-amt" inputmode="decimal" value="'+(e.amt||'')+'" style="width:100%"></div>'
++'<div style="flex:0 0 90px"><label>幣別</label><select class="ee-cur" style="width:100%"><option value="JPY"'+(e.cur!=='HKD'?' selected':'')+'>¥ JPY</option><option value="HKD"'+(e.cur==='HKD'?' selected':'')+'>HK$</option></select></div>'
++'<div style="flex:0 0 120px"><label>日期</label><input type="date" class="ee-date" value="'+(e.date||'')+'" style="width:100%"></div></div>'
++'<div class="ee-row"><div style="flex:1"><label>付款人</label><select class="ee-payer" style="width:100%">'+PAYERS.map(p=>'<option value="'+p+'"'+(p===(e.payer||'媽媽')?' selected':'')+'>'+p+'</option>').join('')+'</select></div></div>'
++'<label>分類</label><div class="ee-cats">'+catBtns+'</div>'
++'<label>備註</label><input class="ee-note" value="'+esc(e.note||'')+'">'
++'<div class="ee-btns"><button class="ee-save">💾 儲存</button><button class="ee-cancel">取消</button></div>';
+/* cat buttons */
+ed.querySelectorAll('.ee-cat').forEach(b=>{b.onclick=ev=>{ev.stopPropagation();ed.querySelectorAll('.ee-cat').forEach(x=>x.classList.remove('on'));b.classList.add('on');};});
+/* save */
+ed.querySelector('.ee-save').onclick=ev=>{ev.stopPropagation();
+const newAmt=Math.round(parseFloat(ed.querySelector('.ee-amt').value)||0);
+const newCur=ed.querySelector('.ee-cur').value;
+const newCat=ed.querySelector('.ee-cat.on')?.dataset.k||e.cat;
+e.title=ed.querySelector('.ee-title').value.trim();
+e.amt=newAmt;e.cur=newCur;
+e.hkd=newCur==='HKD'?newAmt:Math.round(newAmt/RATE);
+e.jpy=newCur==='JPY'?newAmt:Math.round(newAmt*RATE);
+e.cat=newCat;e.date=ed.querySelector('.ee-date').value;
+e.payer=ed.querySelector('.ee-payer').value;
+e.note=ed.querySelector('.ee-note').value.trim();
+editExpId=null;store.set('osk-exp',EXP);renderMoney();};
+/* cancel */
+ed.querySelector('.ee-cancel').onclick=ev=>{ev.stopPropagation();editExpId=null;renderMoney();};
+ed.onclick=ev=>ev.stopPropagation();
+L.appendChild(ed);}});}
 let pendExpImgs=[];
+let editExpId=null;
 let curCurrency='JPY';
 function setCurrency(c){curCurrency=c;const j=$('#curJPY'),h=$('#curHKD'),sym=$('#mCurSym');if(c==='JPY'){j.className='catbtn cur-on';h.className='catbtn';sym.textContent='¥';}else{h.className='catbtn cur-on';j.className='catbtn';sym.textContent='HK$';}}
 
-$('#mExpFile').onchange=e=>{[...e.target.files].forEach(f=>fileToDataURL(f,d=>{pendExpImgs.push(d);const im=ce('img','exp-thumb');im.src=d;$('#mExpImgPreview').appendChild(im);$('#mExpImgCount').textContent=pendExpImgs.length+'張';}));};
+let ocrWorker=null;
+async function initOCR(){
+if(ocrWorker)return ocrWorker;
+$('#ocrStatus').textContent='正在載入 OCR 引擎…';$('#ocrStatus').className='ocr-status';
+try{ocrWorker=await Tesseract.createWorker('jpn',1,{workerPath:'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/worker.min.js',corePath:'https://cdn.jsdelivr.net/npm/tesseract.js-core@5/tesseract-core.wasm.js'});
+$('#ocrStatus').textContent='OCR 就緒';return ocrWorker;}catch(err){$('#ocrStatus').textContent='OCR 載入失敗';$('#ocrStatus').className='ocr-status err';return null;}}
+async function doOCR(dataUrl){
+const w=await initOCR();if(!w)return;
+$('#ocrStatus').textContent='🔍 辨識中…';$('#ocrStatus').className='ocr-status';
+try{const{data:{text}}=await w.recognize(dataUrl);
+$('#ocrStatus').textContent='✅ 辨識完成（可修改後儲存）';
+/* extract amount: look for ¥ or 円 or numeric patterns */
+const amtMatch=text.match(/[¥￥]\s*([\d,]+)/)||text.match(/([\d,]+)\s*円/)||text.match(/合計\s*([\d,]+)/)||text.match(/(\d{2,6})/);
+if(amtMatch&&!$('#mAmt').value){const n=parseInt(amtMatch[1].replace(/,/g,''));if(n>0&&n<999999)$('#mAmt').value=n;setCurrency('JPY');
+$('#mPreview').textContent='≈ HK$'+(n/RATE).toFixed(1);}
+/* extract date: look for yyyy/mm/dd or yyyy-mm-dd or mm/dd */
+const dtMatch=text.match(/(\d{4})[\/\-年](\d{1,2})[\/\-月](\d{1,2})/)||text.match(/(\d{1,2})[\/月](\d{1,2})[日]?/);
+if(dtMatch){let ds;if(dtMatch.length===4){ds=dtMatch[1]+'-'+dtMatch[2].padStart(2,'0')+'-'+dtMatch[3].padStart(2,'0');}
+else ds='2026-'+dtMatch[1].padStart(2,'0')+'-'+dtMatch[2].padStart(2,'0');
+if(!$('#mDay').value||$('#mDay').value==='2026-07-14')$('#mDay').value=ds;}
+/* extract title: first line or line with store-like text */
+const lines=text.split('\n').map(l=>l.trim()).filter(l=>l.length>1&&l.length<40&&!/^\d+$/.test(l)&&!/^[\d,¥￥円%]+$/.test(l));
+if(lines.length&&!$('#mTitle').value)$('#mTitle').value=lines[0].replace(/[　\s]+/g,' ').slice(0,30);
+}catch(err){$('#ocrStatus').textContent='辨識失敗：'+err.message;$('#ocrStatus').className='ocr-status err';}}
+$('#mExpFile').onchange=e=>{const files=[...e.target.files];let firstDone=false;
+files.forEach(f=>fileToDataURL(f,d=>{pendExpImgs.push(d);const im=ce('img','exp-thumb');im.src=d;$('#mExpImgPreview').appendChild(im);$('#mExpImgCount').textContent=pendExpImgs.length+'張';
+if(!firstDone){firstDone=true;doOCR(d);}}));};
 function addExp(){const v=parseFloat($('#mAmt').value);if(!v||v<=0)return;
 const dateVal=$('#mDay').value;
 const amt=Math.round(v);
 const hkd=curCurrency==='HKD'?amt:Math.round(amt/RATE);
 const jpy=curCurrency==='JPY'?amt:Math.round(amt*RATE);
-EXP.unshift({id:Date.now(),amt,cur:curCurrency,hkd,jpy,cat:curCat,date:dateVal,title:($('#mTitle').value||'').trim(),note:$('#mNote').value.trim(),imgs:pendExpImgs.slice()});
+EXP.unshift({id:Date.now(),amt,cur:curCurrency,hkd,jpy,cat:curCat,date:dateVal,payer:$('#mPayer').value,title:($('#mTitle').value||'').trim(),note:$('#mNote').value.trim(),imgs:pendExpImgs.slice()});
 $('#mAmt').value='';$('#mTitle').value='';$('#mNote').value='';$('#mPreview').textContent='';pendExpImgs=[];$('#mExpImgPreview').innerHTML='';$('#mExpImgCount').textContent='';store.set('osk-exp',EXP);renderMoney();}
 
 /* ---- currency ---- */
